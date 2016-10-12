@@ -1,0 +1,17 @@
+.reveal section img {
+    border: 0;
+}
+
+.column-2 {
+    display: inline-block;
+    vertical-align: top !important;
+    width: 49%
+}
+
+.code {
+    font-family: monospace !important;
+}
+
+.reveal h1 {
+  font-size: 1.7em;
+}

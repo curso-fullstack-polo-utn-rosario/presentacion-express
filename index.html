@@ -1,0 +1,428 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>HTML</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/white.css">
+        <link rel="stylesheet" href="css/presentation.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>
+                    <h1>node.js - Express.js </h1>
+                    <h2><a href="http://www.frro.utn.edu.ar">Utn Rosario</a></h2>
+                    <h3>TTADS</h3>
+                    <h3>
+                      <a href="https://github.com/utnfrrottads/">
+
+                        Técnicas y Tecnologías Avanzadas de Desarrollo de Software</a>
+                    </h3>
+                    <p>
+                      <a href="https://github.com/aotaduy">Ing. Andres Otaduy</a>
+                    </p>
+                </section>
+                <section>
+                  <section>
+                    <h1>Multiprogramacion - Concurrencia</h1>
+                    <ul class="fragment">
+                      <li>Procesos</li>
+                      <li>Hilos</li>
+                      <li>Hilos verdes (green threads)</li>
+                      <li>Corutinas</li>
+                      <li>Loop de Eventos</li>
+                    </ul>
+                    <br>
+                    <ul class="fragment">
+                      <li>Preemtiva</li>
+                      <li>Cooperativa</li>
+                    </ul>
+                  </section>
+                  <section>
+                    Entrada y salida
+                    <pre><code class="js">
+var result = db.query('SELECT * FROM clientes');
+result.forEach(function(each){
+  console.log('fila:', each);
+});
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Performance en Web Servers</h1>
+                    <h2>ngnix vs apache</h2>
+                    memoria, performance
+
+                    la diferencia un loop de eventos.
+                  </section>
+
+                  <section>
+                    <h1>node.js</h1>
+                    <p>
+                      Infraestructura sin bloqueo de entrada y salida, puramente orientada a eventos de alta performance.
+                    </p>
+                    <ul>
+                      <li>Js para el server</li>
+                      <li>Maquina virtual V8 de Google</li>
+                      <li>Entrada y salida sin bloqueos y orientada a eventos</li>
+                      <li>Modulos commonJs <code>require('')</code></li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h1>Callbacks para todo</h1>
+                    <p>
+                      Ninguna funcion debe realizar la E/S directamente. Siempre debe haber una callback.
+                    </p>
+                    <p>
+                      Bajo nivel
+                    </p>
+                    <p>
+                      Soporte para TCP, HTTP, DNS, POSIX
+                    </p>
+                  </section>
+                  <section>
+                    <h1>Ejemplo callback</h1>
+                    <pre><code class="js">var fs = require('fs');
+
+  fs.readFile(process.argv[2], function (err, data) {
+    var palabras,
+        lineas = 0,
+        incremento;
+    if (err) {
+       return console.error(err);
+    }
+    palabras = data.length > 0 ? 1 : 0;
+    data.forEach(function (each) {
+      if (each !== 32 && incremento === 1) {
+        palabras = palabras + 1;
+        incremento = 0;
+      }
+      switch(each) {
+        case 10: // LF
+        lineas = lineas + 1;
+        break;
+        case 32: // Space
+          incremento = 1;
+        break;
+      }
+    });
+    console.log('Letras', data.length);
+    console.log('Palabras', palabras);
+    console.log('Lineas', lineas);
+});
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Ejemplo Stream</h1>
+<pre><code class="js">var fs = require('fs');
+
+var stream = fs.createReadStream(process.argv[2]);
+var palabras = 0,
+    lineas = 0,
+    letras = 0;
+
+stream.on('data', function (data) {
+  var incremento = 0;
+  letras = letras + data.length;
+  palabras = data.length > 0 && palabras === 0 ? 1 : 0;
+  data.forEach(function (each) {
+    if (each !== 32 && incremento === 1) {
+      palabras = palabras + 1;
+      incremento = 0;
+    }
+    switch(each) {
+      case 10: // LF
+      lineas = lineas + 1;
+      break;
+      case 32: // Space
+        incremento = 1;
+      break;
+    }
+  });
+});
+
+stream.on('end', function () {
+  console.log('Letras', letras);
+  console.log('Palabras', palabras);
+  console.log('Lineas', lineas);
+});
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Event Emitter</h1>
+                    <pre><code class="js">const myEmitter = new MyEmitter();
+myEmitter.on('event', function(a, b) {
+
+  console.log(a, b, this);
+    // Prints:
+    //   a b MyEmitter {
+    //     domain: null,
+    //     _events: { event: [Function] },
+    //     _eventsCount: 1,
+    //     _maxListeners: undefined }
+});
+
+myEmitter.emit('event', 'a', 'b');
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Ejemplo HTTP</h1>
+                    <pre><code class="js">var http = require('http');
+    var server = http.createServer();
+
+    server.on('connection', function(c) {
+      // 'connection' listener
+      console.log('client connected');
+      c.on('end', function() {
+        console.log('client disconnected');
+      });
+    });
+
+    server.on('request', function(req, res){
+      console.log(req.headers);
+      res.writeHead(200, { 'Content-Type': 'text/html'});
+      res.write('Hola ' + req.url + Math.random());
+      res.end();
+    });
+
+    server.on('error', function (err){
+      throw err;
+    });
+
+    server.listen(8120);
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Links</h1>
+                    <ul>
+                      <li><a href="https://www.youtube.com/watch?v=ztspvPYybIY">Conferencia original de presentacion de node.js</a></li>
+                      <li><a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Que es el event loop?</a></li>
+                      <li><a href="https://nodejs.org">node.js</a></li>
+                      <li><a href="https://npmjs.com">NPM: node package manager</a></li>
+                      <li><a href="https://expressjs.com/">https://expressjs.com/</a></li>
+                    </ul>
+                  </section>
+                </section>
+                <section>
+                  <section>
+                    <h1>Express.js</h1>
+                    <p>
+                      Framework web para HTTP
+                    </p>
+                    <ul>
+                      <li>Simple</li>
+                      <li>Rapido</li>
+                      <li>Asincrona</li>
+                    </ul>
+                    <p>
+                      No proporciona una estructura para la app
+                    </p>
+                    <pre><code class="js">var express = require('express');
+var app = express();
+
+app.get('/', function (req, res) {
+  res.send('Hello World!');
+});
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!');
+});</code></pre>
+                  </section>
+                  <section>
+                    <h1>Rutas</h1>
+                    <pre><code class="js">// app.METHOD(PATH, HANDLER)
+
+app.get('/', function (req, res) {
+  res.send('Hello World!');
+});
+
+app.post('/', function (req, res) {
+  res.send('Got a POST request');
+});
+
+app.put('/user', function (req, res) {
+  res.send('Got a PUT request at /user');
+});
+
+app.delete(/.*-user/, function (req, res) { // regexp
+  res.send('Got a DELETE request at /user');
+});
+
+app.all('/user', function (req, res) {
+  res.send('Got a DELETE request at /user');
+});
+app.get('/users/:userId/books/:bookId', function(req, res) { // Route parameters
+  res.send(req.params);
+});
+</code></pre>
+                  </section>
+                  <section>
+                    <h1></h1>
+                  </section>
+                  <section>
+                    <h1>Middleware</h1>
+                    <p>
+                      Funciones de diferente tipo con acceso a los objetos Request, Response y la funcion <code>next()</code>. Son listas de funciones que se ejecutan antes de procesar la funcion de resolucion de la ruta de un request.
+                    </p>
+
+                    <ul>
+                      <li>Aplicacion</li>
+                      <li>Ruta</li>
+                      <li>Error</li>
+                      <li>Incorporadas</li>
+                      <li>Externas</li>
+                    </ul>
+                    <p>
+                      Una aplicacion expressjs tiene una o varias listas de funciones middleware
+                    </p>
+                  </section>
+                  <section>
+                    <h1>Middleware</h1>
+                    <p>
+                      Un determinado request y response pasan por las diferentes funciones de la lista de middleware hasta que el ciclo termina.
+                    </p>
+                    <ul>
+                      <li>Ejecutar codigo</li>
+                      <li>Hacer cambios en el request y response</li>
+                      <li>Terminar el ciclo de respuesta</li>
+                      <li>Llamar a la siguiente funcion del stack</li>
+                    </ul>
+                  </section>
+                  <section>
+                    <h1>Middleware de aplicacion</h1>
+                    <pre><code class="js">app.use(function (req, res, next) { // Sin punto de montaje (mount point)
+  console.log('Time:', Date.now());
+  next();
+});
+// Montado en '/user/:id'
+app.use('/user/:id', function (req, res, next) {
+  console.log('Request Type:', req.method);
+  next();
+});
+// Montado en GET '/user/:id'
+app.get('/user/:id', function (req, res, next) {
+  console.log('Request Type:', req.method);
+  next();
+});
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Request - Response</h1>
+
+<ul>
+  <li><a href="https://expressjs.com/en/4x/api.html#req">Request</a></li>
+  <li><ul>
+    <li>app</li>
+    <li>baseUrl</li>
+    <li>body - solo si usamos bodyParser o mult</li>
+    <li>cookies</li>
+    <li>query</li>
+
+  </ul></li>
+  <li><a href="https://expressjs.com/en/4x/api.html#res">Response</a></li>
+  <li><ul>
+    <li>cookie(name, value)</li>
+    <li>download(filePath, filename, errHandler), redirect()</li>
+    <li>end()</li>
+    <li>status(404)</li>
+    <li>send(), json(), render()</li>
+  </ul></li>
+</ul>
+                  </section>
+                  <section>
+                    <h1>Router</h1>
+                    <p>
+                      define un conjunto de rutas y middleware como una mini app.
+                    </p>
+                    <pre><code class="js">var express = require('express');
+var router = express.Router();
+
+// middleware that is specific to this router
+router.use(function timeLog(req, res, next) {
+  console.log('Time: ', Date.now());
+  next();
+});
+// define the home page route
+router.get('/', function(req, res) {
+  res.send('Birds home page');
+});
+// define the about route
+router.get('/about', function(req, res) {
+  res.send('About birds');
+});
+
+app.use('/birds', router);</code></pre>
+                  </section>
+                  <section>
+                    <h1>Manejo de Errores</h1>
+                    <pre><code class="js">app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});</code></pre>
+
+<pre><code class="js">var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+app.use(bodyParser.json());
+app.use(methodOverride());
+app.use(logErrors); // Se definen al final
+app.use(clientErrorHandler);
+app.use(errorHandler);
+
+function logErrors(err, req, res, next) { // se pueden encadenar usando next()
+  console.error(err.stack);
+  next(err);
+}
+</code></pre>
+                  </section>
+                  <section>
+                    <h1>Middleware comun</h1>
+                    <ul>
+                      <li>bodyParser, compression, cookie-parser, cookie-session, cors, multer</li>
+                      <li>morgan, response-time, </li>
+                      <li>serve-index, serve-favicon, serve-static</li>
+                      <li>helmet</li>
+                    </ul>
+                  </section>
+                </section>
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                history: true,
+                center: false,
+
+                // More info https://github.com/hakimel/reveal.js#dependencies
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
+</html>
