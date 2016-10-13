@@ -26,7 +26,9 @@
         <div class="reveal">
             <div class="slides">
                 <section>
-                    <h1>node.js - Express.js </h1>
+                  <img src="img/nodejs.png" width="300px" alt="" />
+                  <img src="img/expressjs.png" width="300px" alt="" />
+
                     <h2><a href="http://www.frro.utn.edu.ar">Utn Rosario</a></h2>
                     <h3>TTADS</h3>
                     <h3>
@@ -41,18 +43,31 @@
                 <section>
                   <section>
                     <h1>Multiprogramacion - Concurrencia</h1>
-                    <ul class="fragment">
-                      <li>Procesos</li>
-                      <li>Hilos</li>
-                      <li>Hilos verdes (green threads)</li>
-                      <li>Corutinas</li>
-                      <li>Loop de Eventos</li>
+                    <ul class="fragment" >
+                      <li><ul>
+                        <li>Procesos</li>
+                        <li>Hilos</li>
+                        <li>Hilos verdes (green threads)</li>
+                        <li>Corutinas</li>
+                        <li>Loop de Eventos</li>
+                      </ul></li>
+                      <li><ul class="fragment">
+                        <li>Preemtiva</li>
+                        <li>Cooperativa</li>
+                      </ul></li>
                     </ul>
-                    <br>
-                    <ul class="fragment">
-                      <li>Preemtiva</li>
-                      <li>Cooperativa</li>
-                    </ul>
+
+                  </section>
+
+                  <section>
+                    <h1>Performance en Web Servers</h1>
+                    <h2>ngnix vs apache memoria</h2>
+                    <img src="img/nginx-apache-memory.png" alt="" />
+                  </section>
+                  <section>
+                    <h1>Performance en Web Servers</h1>
+                    <h2>ngnix vs apache requests por segundo</h2>
+                    <img src="img/nginx-apache-reqs-sec.png" alt="" />
                   </section>
                   <section>
                     Entrada y salida
@@ -64,14 +79,6 @@ result.forEach(function(each){
 </code></pre>
                   </section>
                   <section>
-                    <h1>Performance en Web Servers</h1>
-                    <h2>ngnix vs apache</h2>
-                    memoria, performance
-
-                    la diferencia un loop de eventos.
-                  </section>
-
-                  <section>
                     <h1>node.js</h1>
                     <p>
                       Infraestructura sin bloqueo de entrada y salida, puramente orientada a eventos de alta performance.
@@ -82,6 +89,11 @@ result.forEach(function(each){
                       <li>Entrada y salida sin bloqueos y orientada a eventos</li>
                       <li>Modulos commonJs <code>require('')</code></li>
                     </ul>
+                  </section>
+                  <section>
+                    <h1>Event Loop</h1>
+                    <img src="img/eventloop.png" alt="" />
+                    <small><a href="http://abdelraoof.com/blog/2015/10/28/understanding-nodejs-event-loop/">imagen tomada de abdelraoof.com</a></small>
                   </section>
                   <section>
                     <h1>Callbacks para todo</h1>
@@ -206,6 +218,21 @@ myEmitter.emit('event', 'a', 'b');
 
     server.listen(8120);
 </code></pre>
+                  </section>
+                  <section>
+                    <h1>Ejercicio</h1>
+                    <p>
+                      Crear un servidor web estatico que dada una carpeta que ingresa por linea de comandos se abre un servidor en localhost:8118 que sirva los archivos html y css de forma estatica.
+                      Tener en cuenta el header Content-Type para cada uno de los archivos.
+                      Si el cliente web hace un request por un directorio no se debe mostrar el listado de archivos, solamente si el url coincide con un archivo concreto.
+                      Si el url no coincide con ningun archivo devolver un status 404.
+                      <br>
+                      Opcional 1: Agregar la posibilidad de servir imagenes.
+                      <br>
+                      Se puede usar el modulo <a href="https://www.npmjs.com/package/mime-types">mime-types</a> para obtener el content type de los archivos.
+                      usar modulos http, fs y leer los archivos de forma asincrona.
+                    </p>
+
                   </section>
                   <section>
                     <h1>Links</h1>
@@ -400,6 +427,20 @@ function logErrors(err, req, res, next) { // se pueden encadenar usando next()
                       <li>morgan, response-time, </li>
                       <li>serve-index, serve-favicon, serve-static</li>
                       <li>helmet</li>
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h1>Ejercicio</h1>
+                    <p>
+                      Tomar la app de <a href="https://utnfrrottads.github.io/presentacion-angular/#/3/16">Usuarios </a> y el repo <a href="https://github.com/utnfrrottads/angular-express">angular-express</a>
+                      Y crear:
+                    </p>
+                    <ul>
+                      <li>el endpoint <code>/api/v1/usuarios/:id</code> con los metodos get, put, post y delete correspondientes a rest con sequelize</li>
+                      <li>el endpoint <code>/api/v1/search-user/?q=queryString</code> que me permita buscar usuarios por todos sus campos</li>
+                      <li>Implementar el codigo angular para consumir el primer endpoint y persistir los usuarios</li>
+                      <li>Implementar el codigo angular para una pagina de busqueda de usuarios que busque por cualquier campo</li>
                     </ul>
                   </section>
                 </section>
