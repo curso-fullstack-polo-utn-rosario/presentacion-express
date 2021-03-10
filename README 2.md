@@ -1,3 +1,3 @@
 ## Curso Angular UTN FRRO
 
-[Presentacion online](https://utnfrrottads.github.io/presentacion-angular/#/)
+[Presentacion online](https://curso-fullstack-polo-utn-rosario.github.io/presentacion-angular/#/)
