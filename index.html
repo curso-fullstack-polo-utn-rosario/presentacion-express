@@ -456,13 +456,30 @@ function logErrors(err, req, res, next) { // se pueden encadenar usando next()
                         </ul>
                     </section>
                     <section>
+                        <h1>Documentos BSON</h1>
+                        <a href="https://docs.mongodb.com/manual/reference/bson-types/">Referencia</a>
+
+                        <pre><code class="js">
+var mydoc = {
+    _id: ObjectId("5099803df3f4948bd2f98391"),
+    name: { first: "Alan", last: "Turing" },
+    birth: new Date('Jun 23, 1912'),
+    death: new Date('Jun 07, 1954'),
+    contribs: [ "Turing machine", "Turing test", "Turingery" ],
+    views : NumberLong(1250000)
+}
+                        </code></pre>
+                    </section>
+                    <section>
                         <h1>
                             Reglas sobre un documento
                         </h1>
                         <ul>
+                            <li>BSON</li>
                             <li>
                                 debe tener un _id
                             </li>
+                            <li>Max 16MB</li>
                             <li>Formato JSON - BSON</li>
                         </ul>
                     </section>
@@ -471,19 +488,76 @@ function logErrors(err, req, res, next) { // se pueden encadenar usando next()
                         <ul>
                             <li>save()</li>
                             <li>insert()</li>
+                            <li>insertMany()</li>
                             <li>update()</li>
                             <li>findAndModify()</li>
                         </ul>
                     </section>
                     <section>
-                        <h1>update()</h1>
-                        <p>updarte commands</p>
+                        <h1>Creacion de documentos</h1>
+                        <pre><code class="js">
+db.people.inserOne({_id: 1, nombre: 'Pedro', apellido: 'Perez'});
+db.people.inserMany(
+    {_id: 1, nombre: 'Pedro', apellido: 'Perez'},
+    {nombre: 'Javier', apellido: 'Ramirez'},
+    );
+db.people.save({_id: 1, nombre: 'Pedro', apellido: 'Perez'});
+db.people.save({nombre: 'Pedro', apellido: 'Perez'});
+db.people.insertMany(
+    {_id: 1, nombre: 'Pedro', apellido: 'Perez'},
+    {_id: 2, nombre: 'Javier', apellido: 'Ramirez'},
+    );
+</code></pre>
+                    </section>
+                    <section>
+                        <h1>Consulta de documentos</h1>
+                        <p><a href="https://docs.mongodb.com/manual/reference/operator/query/#std-label-query-selectors">selectores</a></p>
+
+                        <pre><code class="js">
+db.people.find({_id: 1});
+
+db.cars.find({kms: {$gt: 100, $lte: 30000}});
+db.cars.find({kms: {$gt: 100, $lte: 30000}}, {year: 1, make: 1, {'model.name': 1}});
+
+db.cars.find({kms: {$gt: 1000, $lte: 50000}, {year: 2000}});
+
+db.cars.find({$or: {kms: {$gt: 1000, $lte: 10000}}, {kms: {$gt: 90000, $lte: 100000}}]});
+
+db.cars.find({year: 2000,  {$or: [{kms: {$gt: 1000, $lte: 10000}}, {kms: {$gt: 90000, $lte: 100000}}]}});
+
+db.cars.find({make: {$in: ['Chevrolet', 'Suzuki']}});
+db.cars.find({make: {$nin: ['Chevrolet', 'Suzuki']}});
+db.cars.find({{year: {$exists: true}});
+
+</code></pre>
+                    </section>
+                    <section>
+                        <h1>Update</h1>
+                        <h4>db.collection.update(query, updateDoc, upsert, multi,...)</h4>
+                        <a href="https://docs.mongodb.com/manual/reference/operator/update/">Operadores de Campo</a>
+                        <pre><code class="js">
+db.people.update({_id: 1}, {_id: 1, nombre: 'Pedro', apellido: 'Perez'});
+db.people.update({_id: 1}, {nombre: 'Pedro', apellido: 'Perez'});
+db.people.update({_id: {$gt: 1, $lte: 100}}, {$set: {saldo: 0}});
+db.people.update({_id: 1}, {$inc: {vidas: 1}});
+
+db.people.update({_id: 1}, {$push: {telefonos: {casa: '3413'}}});
+db.people.update({_id: 1}, {$unset: {telefonos: 1 }});
+
+</code></pre>
+                    </section>
+
+                    <section>
+                        <h1>
+                            Atomicidad de transacciones
+                        </h1>
                         <ul>
-                            <li>$inc</li>
-                            <li>$set</li>
-                            <li>$rename</li>
-                            <li>$unset</li>
-                            <li>Array $push $addToSet $pull pop</li>
+                            <li>Concurrencia</li>
+                            <li>Transacciones</li>
+                            <li>
+                                Operaciones en un documento
+                            </li>
+                            <li>Operaciones en varios documenos</li>
                         </ul>
                     </section>
                     <section>
@@ -495,6 +569,7 @@ function logErrors(err, req, res, next) { // se pueden encadenar usando next()
                             <li> Arrays</li>
                             <li> $all $nin</li>
                             <li> dot notation</li>
+                            <li> subdocument notation</li>
                         </ul>
                     </section>
                 </section>
